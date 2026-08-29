@@ -67,67 +67,127 @@
         color: #777;
         font-size: 13px;
     }
-#datetime {
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    color: #444;
-    background: #ffffff;
-    padding: 12px;
-    margin: 15px auto 30px auto;
-    width: fit-content;
-    min-width: 320px;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
 
-/* Radio button navigation styles */
-.nav-radio-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    background: #f1f5f9;
-    padding: 1.2rem 2rem;
-    border-radius: 60px;
-    margin: 2.5rem auto 1.5rem auto;
-    max-width: 650px;
-    flex-wrap: wrap;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
+    #datetime {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #444;
+        background: #ffffff;
+        padding: 12px;
+        margin: 15px auto 30px auto;
+        width: fit-content;
+        min-width: 320px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
 
-.nav-radio-container label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #1a130e;
-    cursor: pointer;
-    padding: 0.3rem 0.8rem;
-    border-radius: 40px;
-    transition: all 0.2s;
-}
+    .forex-card {
+        background: white;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-align: center;
+    }
 
-.nav-radio-container label:hover {
-    background: rgba(43, 122, 74, 0.08);
-}
+    .forex-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
 
-.nav-radio-container input[type="radio"] {
-    accent-color: #2b7a4a;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
+    .forex-card .rate {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0b1e33;
+        margin: 8px 0;
+    }
 
-.nav-radio-container .highlight {
-    background: #e8f0e8;
-    border: 2px solid #2b7a4a;
-}
+    .forex-card .change {
+        font-size: 1rem;
+        font-weight: 600;
+    }
 
-.nav-radio-container .highlight:hover {
-    background: #d4e8d4;
-}
+    .forex-card .change.positive { color: #0f6e0f; }
+    .forex-card .change.negative { color: #b22222; }
+
+    .forex-card .label {
+        font-size: 13px;
+        color: #777;
+        margin-bottom: 4px;
+    }
+
+    .forex-card .timestamp {
+        font-size: 11px;
+        color: #999;
+        margin-top: 8px;
+    }
+
+    .loading {
+        color: #777;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .error {
+        color: #b22222;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* Radio button navigation styles */
+    .nav-radio-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        background: #f1f5f9;
+        padding: 1.2rem 2rem;
+        border-radius: 60px;
+        margin: 2.5rem auto 1.5rem auto;
+        max-width: 650px;
+        flex-wrap: wrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .nav-radio-container label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #1a130e;
+        cursor: pointer;
+        padding: 0.3rem 0.8rem;
+        border-radius: 40px;
+        transition: all 0.2s;
+    }
+
+    .nav-radio-container label:hover {
+        background: rgba(43, 122, 74, 0.08);
+    }
+
+    .nav-radio-container input[type="radio"] {
+        accent-color: #2b7a4a;
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .nav-radio-container .highlight {
+        background: #e8f0e8;
+        border: 2px solid #2b7a4a;
+    }
+
+    .nav-radio-container .highlight:hover {
+        background: #d4e8d4;
+    }
+
+    @media (max-width: 600px) {
+        .forex-card .rate { font-size: 1.5rem; }
+        .nav-radio-container { gap: 0.8rem; padding: 0.8rem 1rem; }
+        .nav-radio-container label { font-size: 0.8rem; padding: 0.2rem 0.5rem; }
+    }
 </style>
 
 </head>
@@ -136,6 +196,27 @@
 
 <h1>🇮🇳 India Market Dashboard</h1>
 <div id="datetime"></div>
+
+<!-- ===== FOREX & GLOBAL INDICATORS ===== -->
+<h2>🌍 Forex & Global Indicators</h2>
+<div class="grid" id="forexGrid">
+    <!-- USD/INR Card -->
+    <div class="forex-card" id="usdinr-card">
+        <div class="label">💵 USD/INR</div>
+        <div class="rate" id="usdinr-rate">Loading...</div>
+        <div class="change" id="usdinr-change"></div>
+        <div class="timestamp" id="usdinr-time"></div>
+    </div>
+
+    <!-- DXY Card -->
+    <div class="forex-card" id="dxy-card">
+        <div class="label">📈 DXY (Dollar Index)</div>
+        <div class="rate" id="dxy-rate">Loading...</div>
+        <div class="change" id="dxy-change"></div>
+        <div class="timestamp" id="dxy-time"></div>
+    </div>
+</div>
+
 <h2>Government Bonds & Macro Data</h2>
 
 <div class="grid">
@@ -400,34 +481,89 @@ Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
 "Unless and until what you are building is based on Truth & Honesty, you are building on sand; it can't stand; it simply cannot withstand the test of time."
 </footer>
 
+<!-- ===== FOREX API SCRIPT ===== -->
 <script>
+    (function() {
+        // ===== FREE CURRENCY API KEY =====
+        const FC_API_KEY = 'fca_live_2PannbY0pTJA1QRDxqG5cKpbpL3GIYn9ZQLqtRbH';
 
-function updateDateTime() {
+        // ----- Fetch USD/INR -----
+        async function fetchUSDINR() {
+            try {
+                const response = await fetch(`https://api.freecurrencyapi.com/v1/latest?apikey=${FC_API_KEY}&base_currency=USD&currencies=INR`);
+                const data = await response.json();
+                
+                if (data.data && data.data.INR) {
+                    const rate = data.data.INR;
+                    document.getElementById('usdinr-rate').textContent = `₹${rate.toFixed(2)}`;
+                    document.getElementById('usdinr-change').textContent = 'Live rate';
+                    document.getElementById('usdinr-change').className = 'change';
+                    document.getElementById('usdinr-time').textContent = `Updated: ${new Date().toLocaleTimeString('en-IN')}`;
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (error) {
+                document.getElementById('usdinr-rate').textContent = '⚠️ Error';
+                document.getElementById('usdinr-change').textContent = 'Unable to fetch';
+                document.getElementById('usdinr-change').className = 'change negative';
+                console.error('USD/INR Error:', error);
+            }
+        }
 
-    const now = new Date();
+        // ----- Fetch DXY Components and Calculate -----
+        async function fetchDXY() {
+            try {
+                // DXY = 57.6% EUR/USD + 13.6% USD/JPY + 11.9% GBP/USD + 9.1% USD/CAD + 4.2% USD/SEK + 3.6% USD/CHF
+                // We need to fetch all these currencies
+                const currencies = ['EUR', 'JPY', 'GBP', 'CAD', 'SEK', 'CHF'];
+                const response = await fetch(`https://api.freecurrencyapi.com/v1/latest?apikey=${FC_API_KEY}&base_currency=USD&currencies=${currencies.join(',')}`);
+                const data = await response.json();
+                
+                if (data.data) {
+                    // Extract rates
+                    const eur = data.data.EUR; // EUR/USD
+                    const jpy = data.data.JPY; // USD/JPY (inverse)
+                    const gbp = data.data.GBP; // GBP/USD
+                    const cad = data.data.CAD; // USD/CAD (inverse)
+                    const sek = data.data.SEK; // USD/SEK (inverse)
+                    const chf = data.data.CHF; // USD/CHF (inverse)
+                    
+                    // Calculate DXY using the formula
+                    // DXY = 50.14348112 * (EUR/USD)^-0.576 * (USD/JPY)^0.136 * (GBP/USD)^-0.119 * (USD/CAD)^0.091 * (USD/SEK)^0.042 * (USD/CHF)^0.036
+                    // Simplified: DXY = 50.14348112 * (1/EUR)^0.576 * JPY^0.136 * (1/GBP)^0.119 * CAD^0.091 * SEK^0.042 * CHF^0.036
+                    
+                    const dxy = 50.14348112 * 
+                        Math.pow(1/eur, 0.576) * 
+                        Math.pow(jpy, 0.136) * 
+                        Math.pow(1/gbp, 0.119) * 
+                        Math.pow(cad, 0.091) * 
+                        Math.pow(sek, 0.042) * 
+                        Math.pow(chf, 0.036);
+                    
+                    document.getElementById('dxy-rate').textContent = dxy.toFixed(2);
+                    document.getElementById('dxy-change').textContent = 'Calculated DXY';
+                    document.getElementById('dxy-change').className = 'change';
+                    document.getElementById('dxy-time').textContent = `Updated: ${new Date().toLocaleTimeString('en-IN')}`;
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (error) {
+                document.getElementById('dxy-rate').textContent = '⚠️ Error';
+                document.getElementById('dxy-change').textContent = 'Unable to calculate';
+                document.getElementById('dxy-change').className = 'change negative';
+                console.error('DXY Error:', error);
+            }
+        }
 
-    const options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour24: true,
-        timeZone: 'Asia/Kolkata'
-    };
+        // ----- Fetch both on load -----
+        fetchUSDINR();
+        fetchDXY();
 
-    document.getElementById("datetime").innerHTML =
-        "📅 " + now.toLocaleString("en-IN", options) +
-        " 🇮🇳 IST";
-
-}
-
-updateDateTime();
-
-setInterval(updateDateTime, 180);
-
+        // ----- Refresh every 60 seconds -----
+        setInterval(fetchUSDINR, 60000);
+        setInterval(fetchDXY, 60000);
+    })();
 </script>
+
 </body>
 </html>
