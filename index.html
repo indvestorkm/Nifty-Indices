@@ -141,6 +141,49 @@
         margin-top: 8px;
     }
 
+    /* VT Price Card */
+    .vt-card {
+        background: white;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-align: center;
+        border-left: 4px solid #1a2a5a;
+    }
+
+    .vt-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+
+    .vt-card .label {
+        font-size: 13px;
+        color: #777;
+        margin-bottom: 4px;
+    }
+
+    .vt-card .rate {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #0b1e33;
+        margin: 6px 0;
+    }
+
+    .vt-card .change {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .vt-card .change.positive { color: #0f6e0f; }
+    .vt-card .change.negative { color: #b22222; }
+
+    .vt-card .timestamp {
+        font-size: 11px;
+        color: #999;
+        margin-top: 6px;
+    }
+
     .loading {
         color: #777;
         font-size: 14px;
@@ -249,6 +292,7 @@
 
     @media (max-width: 600px) {
         .forex-card .rate { font-size: 1.5rem; }
+        .vt-card .rate { font-size: 1.3rem; }
         .nav-radio-container { gap: 0.8rem; padding: 0.8rem 1rem; }
         .nav-radio-container label { font-size: 0.8rem; padding: 0.2rem 0.5rem; }
         #datetime { font-size: 15px; min-width: auto; padding: 10px; }
@@ -283,6 +327,14 @@
         <div class="rate" id="dxy-rate">Loading...</div>
         <div class="change" id="dxy-change"></div>
         <div class="timestamp" id="dxy-time"></div>
+    </div>
+
+    <!-- VT Price Card -->
+    <div class="vt-card" id="vt-card">
+        <div class="label">🌍 Vanguard Total World Stock (VT)</div>
+        <div class="rate" id="vt-rate">Loading...</div>
+        <div class="change" id="vt-change"></div>
+        <div class="timestamp" id="vt-time"></div>
     </div>
 </div>
 
@@ -487,13 +539,6 @@ Tata Gold ETF (INF277KA1976)
 </a>
 </div>
 
-<div class="card">
-<a href="https://investor.vanguard.com/investment-products/etfs/profile/vt"
-target="_blank">
-Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
-</a>
-</div>
-
 </div>
 
 <!-- ===== NAVIGATION RADIO BUTTONS ===== -->
@@ -566,6 +611,7 @@ Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
     (function() {
         // ===== API KEYS =====
         const FC_API_KEY = 'fca_live_2PannbY0pTJA1QRDxqG5cKpbpL3GIYn9ZQLqtRbH';
+        const TD_API_KEY = 'f02cb5b6eed74c7d8eb0b954dbfe9b7e'; // Your Twelve Data key
 
         // ===== LIVE CLOCK =====
         function updateDateTime() {
@@ -632,8 +678,6 @@ Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
             const statusElement = document.getElementById('usMarketStatus');
             const seasonElement = document.getElementById('usSeason');
 
-            // Check if it's a weekend (Saturday or Sunday in IST)
-            // US market is open Monday–Friday (in US time), which is Monday–Friday in IST
             if (day === 0 || day === 6) {
                 statusElement.innerHTML = '🔒 US Market Closed (Weekend)';
                 statusElement.className = 'status closed';
@@ -641,20 +685,16 @@ Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
                 return;
             }
 
-            // Determine if Daylight Savings (US) is active
-            // US Daylight Savings: Second Sunday in March to First Sunday in November
             const year = now.getFullYear();
             const march = new Date(year, 2, 1);
             const nov = new Date(year, 10, 1);
             
-            // Find second Sunday in March
             let secondSundayMarch = new Date(year, 2, 1);
             while (secondSundayMarch.getDay() !== 0) {
                 secondSundayMarch.setDate(secondSundayMarch.getDate() + 1);
             }
             secondSundayMarch.setDate(secondSundayMarch.getDate() + 7);
             
-            // Find first Sunday in November
             let firstSundayNov = new Date(year, 10, 1);
             while (firstSundayNov.getDay() !== 0) {
                 firstSundayNov.setDate(firstSundayNov.getDate() + 1);
@@ -662,32 +702,25 @@ Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
             
             const isDST = now >= secondSundayMarch && now < firstSundayNov;
             
-            // US Market Hours in IST
-            // Standard Time (Nov–Mar): 8:00 PM – 2:30 AM IST
-            // Daylight Savings (Mar–Nov): 7:00 PM – 1:30 AM IST
             let openTime, closeTime, seasonLabel;
             
             if (isDST) {
-                openTime = 19 * 60;  // 7:00 PM
-                closeTime = 25 * 60 + 30; // 1:30 AM (next day)
+                openTime = 19 * 60;
+                closeTime = 25 * 60 + 30;
                 seasonLabel = 'Daylight Savings (Mar – Nov)';
             } else {
-                openTime = 20 * 60;  // 8:00 PM
-                closeTime = 26 * 60 + 30; // 2:30 AM (next day)
+                openTime = 20 * 60;
+                closeTime = 26 * 60 + 30;
                 seasonLabel = 'Standard Time (Nov – Mar)';
             }
             
             seasonElement.textContent = `Currently: ${seasonLabel}`;
             
-            // Check if market is open
-            // For US market, we need to handle the crossing of midnight
             let isOpen = false;
             
             if (timeInMinutes >= openTime && timeInMinutes < closeTime) {
                 isOpen = true;
             } else if (timeInMinutes >= 0 && timeInMinutes < (closeTime - 24 * 60)) {
-                // For times after midnight (0:00 AM to closeTime-24:00)
-                // Only if closeTime is after midnight
                 if (closeTime > 24 * 60) {
                     isOpen = true;
                 }
@@ -763,6 +796,36 @@ Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
             }
         }
 
+        // ===== VT PRICE (Twelve Data) =====
+        async function fetchVT() {
+            try {
+                // Twelve Data endpoint for VT (Vanguard Total World Stock)
+                const response = await fetch(`https://api.twelvedata.com/price?symbol=VT&apikey=${TD_API_KEY}`);
+                const data = await response.json();
+                
+                if (data.price) {
+                    const price = parseFloat(data.price);
+                    document.getElementById('vt-rate').textContent = `$${price.toFixed(2)}`;
+                    document.getElementById('vt-change').textContent = 'Live price';
+                    document.getElementById('vt-change').className = 'change';
+                    document.getElementById('vt-time').textContent = `Updated: ${new Date().toLocaleTimeString('en-IN')}`;
+                } else if (data.status === 'error') {
+                    // API key rate limit or error
+                    document.getElementById('vt-rate').textContent = '⏳ Limit';
+                    document.getElementById('vt-change').textContent = 'API rate limit (retry)';
+                    document.getElementById('vt-change').className = 'change negative';
+                    console.warn('Twelve Data API error:', data.message);
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (error) {
+                document.getElementById('vt-rate').textContent = '⚠️ Error';
+                document.getElementById('vt-change').textContent = 'Unable to fetch VT';
+                document.getElementById('vt-change').className = 'change negative';
+                console.error('VT Error:', error);
+            }
+        }
+
         // ===== INITIALISE =====
         function refreshAll() {
             updateDateTime();
@@ -770,17 +833,19 @@ Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
             updateUSMarketStatus();
             fetchUSDINR();
             fetchDXY();
+            fetchVT();
         }
 
         // Run immediately
         refreshAll();
 
         // Set intervals
-        setInterval(updateDateTime, 1000);        // Clock: every second
-        setInterval(updateMarketStatus, 30000);   // NSE: every 30 seconds
-        setInterval(updateUSMarketStatus, 30000); // US: every 30 seconds
-        setInterval(fetchUSDINR, 60000);          // USD/INR: every minute
-        setInterval(fetchDXY, 60000);             // DXY: every minute
+        setInterval(updateDateTime, 1000);
+        setInterval(updateMarketStatus, 30000);
+        setInterval(updateUSMarketStatus, 30000);
+        setInterval(fetchUSDINR, 60000);
+        setInterval(fetchDXY, 60000);
+        setInterval(fetchVT, 60000);
     })();
 </script>
 
