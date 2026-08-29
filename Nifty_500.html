@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Nifty 500 – Deep Dive & Performance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f8fafc;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1300px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            padding: 2rem 2rem 2.5rem;
+            transition: all 0.2s;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            text-decoration: none;
+            color: #1a130e;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid #eef2f6;
+            transition: all 0.2s;
+            margin-bottom: 1.5rem;
+        }
+        .back-link:hover {
+            background: #e2e8f0;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #0b1e33;
+            border-bottom: 2px solid #eef2f6;
+            padding-bottom: 1rem;
+            margin-bottom: 1.75rem;
+        }
+        h1 small {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #4b5a6e;
+            margin-left: 0.5rem;
+        }
+        .subtitle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            color: #1e2a3a;
+        }
+        .badge {
+            background: #eef2f6;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1f3a5f;
+        }
+        .badge.gold { background: #f7d44a; color: #1f1808; }
+        .badge.green { background: #b9e6b9; color: #0a3b0a; }
+
+        /* Quilt Chart */
+        .quilt-grid {
+            display: grid;
+            grid-template-columns: 100px repeat(12, 1fr);
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 20px;
+            margin-bottom: 2.5rem;
+            overflow-x: auto;
+            min-width: 750px;
+        }
+        .quilt-header {
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+        .quilt-cell {
+            padding: 0.6rem 0.2rem;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #0b1e33;
+            background: #e9edf2;
+            transition: all 0.1s ease;
+            min-width: 60px;
+        }
+        .quilt-cell.year-label {
+            background: transparent;
+            font-weight: 500;
+            color: #1e2a3a;
+            text-align: right;
+            padding-right: 0.8rem;
+            font-size: 0.85rem;
+            min-width: 80px;
+        }
+        .positive { background: #b9e6b9; color: #0a3b0a; }
+        .negative { background: #fbc5c5; color: #7a1f1f; }
+        .neutral { background: #e9edf2; color: #2c3e50; }
+        .very-positive { background: #4caf7a; color: white; }
+        .very-negative { background: #b33d24; color: white; }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 1rem 0 2rem;
+            font-size: 0.9rem;
+            align-items: center;
+        }
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend .dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 6px;
+        }
+        .dot.green { background: #b9e6b9; }
+        .dot.red { background: #fbc5c5; }
+        .dot.very-green { background: #4caf7a; }
+        .dot.very-red { background: #b33d24; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            margin: 1.5rem 0;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e2a3a;
+            font-weight: 600;
+            padding: 0.9rem 0.6rem;
+            text-align: center;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        td {
+            padding: 0.7rem 0.5rem;
+            text-align: center;
+            border-bottom: 1px solid #eef2f6;
+            background: white;
+        }
+        tr:last-child td { border-bottom: none; }
+        .highlight-green { color: #0f6e0f; font-weight: 600; }
+        .highlight-red { color: #b22222; font-weight: 600; }
+        .text-muted { color: #5b6f84; font-size: 0.85rem; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.2rem;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin: 2rem 0 1rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            text-align: center;
+        }
+        .stat-card .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #5b6f84;
+        }
+        .stat-card .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0b1e33;
+            margin-top: 4px;
+        }
+        .stat-card .value.green { color: #0f6e0f; }
+        .stat-card .value.red { color: #b22222; }
+        .stat-card .value.gold { color: #b3860a; }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .compare-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            border-left: 4px solid #2b7a4a;
+        }
+        .compare-card .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #5b6f84;
+        }
+        .compare-card .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 4px 0 2px;
+        }
+        .compare-card .sub {
+            font-size: 0.75rem;
+            color: #5b6f84;
+        }
+
+        .footnote {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #4b5a6e;
+            border-top: 1px solid #eef2f6;
+            padding-top: 1.5rem;
+            text-align: center;
+        }
+        .footnote strong { color: #0b1e33; }
+
+        .insight-box {
+            background: #f1f5f9;
+            border-radius: 18px;
+            padding: 1.5rem;
+            margin: 2.2rem 0 0.8rem;
+        }
+        .insight-box h3 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #0b1e33;
+        }
+        .insight-box ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            color: #1e2a3a;
+        }
+        .insight-box ul li::before {
+            content: "✔ ";
+            color: #2b7a4a;
+            font-weight: 700;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 1.25rem; }
+            .quilt-grid { grid-template-columns: 70px repeat(12, 1fr); gap: 4px; padding: 0.6rem; }
+            .quilt-cell { font-size: 0.6rem; padding: 0.35rem 0.1rem; min-width: 35px; }
+            .quilt-cell.year-label { font-size: 0.65rem; padding-right: 0.4rem; min-width: 55px; }
+            h1 { font-size: 1.4rem; flex-wrap: wrap; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .compare-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- BACK LINK -->
+    <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <h1>
+        📊 Nifty 500
+        <small>Total Returns Index · 2015 – 2026 YTD</small>
+    </h1>
+
+    <div class="subtitle">
+        <span class="badge gold">📅 Data: 2015 – 28 Aug 2026</span>
+        <span class="badge green">🧵 The "True Market" Index</span>
+    </div>
+
+    <!-- QUILT CHART -->
+    <div class="quilt-grid">
+        <div class="quilt-header">Year</div>
+        <div class="quilt-header">'15</div>
+        <div class="quilt-header">'16</div>
+        <div class="quilt-header">'17</div>
+        <div class="quilt-header">'18</div>
+        <div class="quilt-header">'19</div>
+        <div class="quilt-header">'20</div>
+        <div class="quilt-header">'21</div>
+        <div class="quilt-header">'22</div>
+        <div class="quilt-header">'23</div>
+        <div class="quilt-header">'24</div>
+        <div class="quilt-header">'25</div>
+        <div class="quilt-header">'26*</div>
+
+        <!-- 2015 -->
+        <div class="quilt-cell year-label">2015</div>
+        <div class="quilt-cell neutral">+0.04%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2016 -->
+        <div class="quilt-cell year-label">2016</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell positive">+4.68%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2017 -->
+        <div class="quilt-cell year-label">2017</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell very-positive">+37.27%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2018 -->
+        <div class="quilt-cell year-label">2018</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell negative">-1.55%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2019 -->
+        <div class="quilt-cell year-label">2019</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell positive">+8.64%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2020 -->
+        <div class="quilt-cell year-label">2020</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell positive">+17.70%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2021 -->
+        <div class="quilt-cell year-label">2021</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell very-positive">+30.96%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2022 -->
+        <div class="quilt-cell year-label">2022</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell positive">+2.82%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2023 -->
+        <div class="quilt-cell year-label">2023</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell very-positive">+26.30%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2024 -->
+        <div class="quilt-cell year-label">2024</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell positive">+16.00%</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2025 -->
+        <div class="quilt-cell year-label">2025</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell positive">+7.25%</div>
+        <div class="quilt-cell neutral"></div>
+
+        <!-- 2026* -->
+        <div class="quilt-cell year-label">2026*</div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell neutral"></div>
+        <div class="quilt-cell negative">-0.85%</div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+        <span><span class="dot very-green"></span> ≥ +25%</span>
+        <span><span class="dot green"></span> Positive return</span>
+        <span><span class="dot red"></span> Negative return</span>
+        <span><span class="dot very-red"></span> ≤ -10%</span>
+        <span style="color:#5b6f84;">* 2026 YTD until 28 Aug</span>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="stats-grid">
+        <div class="stat-card"><div class="label">Worst year</div><div class="value red">-1.55%</div><div class="text-muted">2018</div></div>
+        <div class="stat-card"><div class="label">Best year</div><div class="value green">+37.27%</div><div class="text-muted">2017</div></div>
+        <div class="stat-card"><div class="label">CAGR (11Y)</div><div class="value green">+13.83%</div><div class="text-muted">2015–2025</div></div>
+        <div class="stat-card"><div class="label">2026 YTD</div><div class="value red">-0.85%</div><div class="text-muted">as of 28 Aug</div></div>
+        <div class="stat-card"><div class="label">Negative years</div><div class="value" style="color:#b22222;">2 / 11</div><div class="text-muted">2018, 2026*</div></div>
+    </div>
+
+    <!-- COMPARISON WITH OTHER INDICES -->
+    <h2 style="font-size: 1.3rem; font-weight: 600; margin: 2rem 0 0.8rem; color: #0b1e33;">📊 Nifty 500 vs Other Indices</h2>
+    <div class="compare-grid">
+        <div class="compare-card" style="border-left-color: #2b5c9c;">
+            <div class="label">vs Nifty 50</div>
+            <div class="value" style="color: #2b5c9c;">+1.46%</div>
+            <div class="sub">Better CAGR (11Y)</div>
+        </div>
+        <div class="compare-card" style="border-left-color: #b3860a;">
+            <div class="label">vs Nifty Next 50</div>
+            <div class="value" style="color: #b3860a;">+0.00%</div>
+            <div class="sub">Same CAGR (11Y)</div>
+        </div>
+        <div class="compare-card" style="border-left-color: #2b7a4a;">
+            <div class="label">vs Midcap 150</div>
+            <div class="value" style="color: #b33d24;">-3.64%</div>
+            <div class="sub">Lower CAGR (11Y)</div>
+        </div>
+        <div class="compare-card" style="border-left-color: #b33d24;">
+            <div class="label">vs Smallcap 250</div>
+            <div class="value" style="color: #b33d24;">-0.50%</div>
+            <div class="sub">Lower CAGR (11Y)</div>
+        </div>
+    </div>
+
+    <!-- DETAILED TABLE -->
+    <h2 style="font-size: 1.4rem; font-weight: 600; margin: 2rem 0 0.5rem; color: #0b1e33;">📋 Annual performance</h2>
+    <table>
+        <thead>
+            <tr><th>Year</th><th>Start</th><th>End</th><th>Return</th><th>Cumulative</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>2015</strong></td><td>9,598.91</td><td>9,602.78</td><td class="highlight-green">+0.04%</td><td>+0.04%</td></tr>
+            <tr><td><strong>2016</strong></td><td>9,643.99</td><td>10,094.85</td><td class="highlight-green">+4.68%</td><td>+4.72%</td></tr>
+            <tr><td><strong>2017</strong></td><td>10,123.35</td><td>13,896.02</td><td class="highlight-green">+37.27%</td><td>+44.57%</td></tr>
+            <tr><td><strong>2018</strong></td><td>13,813.81</td><td>13,599.13</td><td class="highlight-red">-1.55%</td><td>+42.43%</td></tr>
+            <tr><td><strong>2019</strong></td><td>13,640.46</td><td>14,819.29</td><td class="highlight-green">+8.64%</td><td>+54.63%</td></tr>
+            <tr><td><strong>2020</strong></td><td>14,843.29</td><td>17,470.79</td><td class="highlight-green">+17.70%</td><td>+82.35%</td></tr>
+            <tr><td><strong>2021</strong></td><td>17,556.56</td><td>22,990.88</td><td class="highlight-green">+30.96%</td><td>+138.25%</td></tr>
+            <tr><td><strong>2022</strong></td><td>23,310.38</td><td>23,967.12</td><td class="highlight-green">+2.82%</td><td>+144.78%</td></tr>
+            <tr><td><strong>2023</strong></td><td>24,083.14</td><td>30,417.80</td><td class="highlight-green">+26.30%</td><td>+210.19%</td></tr>
+            <tr><td><strong>2024</strong></td><td>30,480.99</td><td>35,357.90</td><td class="highlight-green">+16.00%</td><td>+260.22%</td></tr>
+            <tr><td><strong>2025</strong></td><td>35,526.08</td><td>38,101.06</td><td class="highlight-green">+7.25%</td><td>+286.34%</td></tr>
+            <tr><td><strong>2026*</strong></td><td>38,161.77</td><td>37,837.70</td><td class="highlight-red">-0.85%</td><td>+281.12%</td></tr>
+        </tbody>
+    </table>
+    <div style="text-align: right; font-size: 0.8rem; color: #5b6f84; margin-top: -0.2rem;">* YTD until 28 Aug 2026</div>
+
+    <!-- KEY INSIGHTS -->
+    <div class="insight-box">
+        <h3>🧠 Key takeaways</h3>
+        <ul>
+            <li><strong>Nifty 500 is the "True Market"</strong> — captures ~95% of India's market cap</li>
+            <li><strong>Remarkably stable</strong> — only 2 negative years in 11 (2018, 2026 YTD)</li>
+            <li><strong>CAGR of 13.83%</strong> — matches Nifty Next 50, but with <strong>lower volatility</strong></li>
+            <li><strong>Worst year was only -1.55%</strong> — incredibly resilient compared to smallcaps (-26.54%)</li>
+            <li><strong>Perfect core holding</strong> — gives you the entire market's return with much less drama</li>
+            <li><strong>2026 YTD shows the market is flat</strong> — after a strong 2023–2025 run, consolidation is normal</li>
+        </ul>
+    </div>
+
+    <div class="footnote">
+        <strong>Nifty 500 – Total Returns Index</strong> · Data sourced from Nifty Indices official TRI levels (2015–2026).<br>
+        *2026 return is YTD until 28 August 2026. Past performance does not guarantee future results.
+    </div>
+</div>
+</body>
+</html>
