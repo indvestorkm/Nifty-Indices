@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>India Market Dashboard</title>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 20px;
+        color: #222;
+    }
+
+    h1 {
+        text-align: center;
+        color: #0b3d91;
+        margin-bottom: 30px;
+    }
+
+    h2 {
+        color: #163a63;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 8px;
+        margin-top: 35px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+
+    .card a {
+        text-decoration: none;
+        color: #0066cc;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .category {
+        font-size: 13px;
+        color: #777;
+        margin-bottom: 8px;
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 40px;
+        color: #777;
+        font-size: 13px;
+    }
+#datetime {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #444;
+    background: #ffffff;
+    padding: 12px;
+    margin: 15px auto 30px auto;
+    width: fit-content;
+    min-width: 320px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🇮🇳 India Market Dashboard</h1>
+<div id="datetime"></div>
+<h2>Government Bonds & Macro Data</h2>
+
+<div class="grid">
+
+<div class="card">
+<div class="category">Government Bonds</div>
+<a href="https://www.worldgovernmentbonds.com/country/india/" target="_blank">
+India Government Bonds
+</a>
+</div>
+
+<div class="card">
+<div class="category">Bond History</div>
+<a href="https://www.worldgovernmentbonds.com/bond-historical-data/india/10-years/" target="_blank">
+India 10 Year Bond Historical Data
+</a>
+</div>
+
+<div class="card">
+<div class="category">Reserve Bank of India</div>
+<a href="https://www.rbi.org.in/scripts/Statistics.aspx" target="_blank">
+RBI LAF
+</a>
+</div>
+
+<div class="card">
+<div class="category">Inflation</div>
+<a href="https://www.mospi.gov.in/themes/product/9-consumer-price-index-cpi" target="_blank">
+Consumer Price Index (CPI)
+</a>
+</div>
+
+<div class="card">
+<div class="category">RBI Updates</div>
+<a href="https://www.rbi.org.in/commonperson/english/scripts/PressReleases.aspx" target="_blank">
+RBI MPC
+</a>
+</div>
+
+</div>
+
+<h2>Broad Market Index PE's</h2>
+
+<div class="grid">
+
+<div class="card">
+<a href="https://indexpe.in/nifty-50" target="_blank">
+Nifty 50 PE
+</a>
+</div>
+
+<div class="card">
+<a href="https://indexpe.in/nifty-next-50" target="_blank">
+Nifty Next 50 PE
+</a>
+</div>
+
+<div class="card">
+<a href="https://indexpe.in/nifty-midcap-150" target="_blank">
+Nifty Midcap 150 PE
+</a>
+</div>
+
+<div class="card">
+<a href="https://indexpe.in/nifty-smallcap-250" target="_blank">
+Nifty Smallcap 250 PE
+</a>
+</div>
+
+</div>
+
+<h2>Broad Market Index Market Insights</h2>
+
+<div class="grid">
+
+<div class="card">
+<a href="https://insights.market/index/NIFTY" target="_blank">
+NIFTY 50 Price Growth vs EPS Growth
+</a>
+</div>
+
+<div class="card">
+<a href="https://insights.market/index/NIFTYJR" target="_blank">
+NIFTY Junior Price Growth vs EPS Growth
+</a>
+</div>
+
+<div class="card">
+<a href="https://insights.market/index/NMIDCAP150" target="_blank">
+Nifty Midcap 150 Price Growth vs EPS Growth
+</a>
+</div>
+
+<div class="card">
+<a href="https://insights.market/index/SMALLCA250" target="_blank">
+Small Cap Price Growth vs EPS Growth
+</a>
+</div>
+
+</div>
+
+<h2>NSE Data & Derivatives</h2>
+
+<div class="grid">
+
+<div class="card">
+<a href="https://www.nseindia.com/option-chain" target="_blank">
+NSE Option Chain F&O
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.nseindia.com/reports-indices-yield" target="_blank">
+Historical Index (PE/PB/DY) Yield Reports
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.nseindia.com/reports-indices-historical-vix" target="_blank">
+Historical India VIX
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.nseindia.com/reports-indices-historical-index-data" target="_blank">
+Historical Index Data
+</a>
+</div>
+
+</div>
+
+<h2>Nifty Indices Historical Data</h2>
+
+<div class="grid">
+
+<div class="card">
+<a href="https://www.niftyindices.com/reports/historical-data" target="_blank">
+Nifty Historical TRI/PRI/PE/PD/DY Data
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.niftyindices.com/market-data/return-profile" target="_blank">
+Nifty Return Profile
+</a>
+</div>
+
+</div>
+
+<h2>Market Sentiment & Gold</h2>
+
+<div class="grid">
+
+<div class="card">
+<a href="https://www.tickertape.in/market-mood-index" target="_blank">
+Tickertape Market Mood Index
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.ibjarates.com" target="_blank">
+India Bullion and Jewellers Association
+</a>
+</div>
+
+</div>
+
+<h2>My ETF's</h2>
+
+<div class="grid">
+
+<div class="card">
+<a href="https://www.nseindia.com/get-quote/equity/NIFTYBETA/UTI-Nifty-50-ETF" target="_blank">
+UTI Nifty 50 ETF (INF789F1AZC0)
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.nseindia.com/get-quote/equity/NEXT50IETF/ICICI-Prudential-Mutual-Fund---ICICI-Prudential-Nifty-Next-50-ETF" target="_blank">
+ICICI Prudential Nifty Next 50 ETF (INF109KC1NS5)
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.nseindia.com/get-quote/equity/MIDCAPETF/Mirae-Asset-Mutual-Fund---Mirae-Asset-Nifty-Midcap-150-ETF" target="_blank">
+Mirae Asset Nifty Midcap 150 ETF (INF769K01IC9)
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.nseindia.com/get-quote/equity/MOSMALL250/Motilal-Oswal-Nifty-Smallcap-250-ETF" target="_blank">
+Motilal Oswal Nifty Smallcap 250 ETF (INF247L01CH6)
+</a>
+</div>
+
+<div class="card">
+<a href="https://www.nseindia.com/get-quote/equity/TATAGOLD/Tata-Mutual-Fund-Tata-Gold-Exchange-Traded-Fund" target="_blank">
+Tata Gold ETF (INF277KA1976)
+</a>
+</div>
+
+<div class="card">
+<a href="https://investor.vanguard.com/investment-products/etfs/profile/vt"
+target="_blank">
+Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
+</a>
+</div>
+
+</div>
+
+<footer>
+"Unless and until what you are building is based on Truth & Honesty, you are building on sand; it can't stand; it simply cannot withstand the test of time."
+</footer>
+
+<script>
+
+function updateDateTime() {
+
+    const now = new Date();
+
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour24: true,
+        timeZone: 'Asia/Kolkata'
+    };
+
+    document.getElementById("datetime").innerHTML =
+        "📅 " + now.toLocaleString("en-IN", options) +
+        " 🇮🇳 IST";
+
+}
+
+updateDateTime();
+
+setInterval(updateDateTime, 180);
+
+</script>
+</body>
+</html>
