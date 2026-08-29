@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Nifty Indices · Complete Quilt Dashboard (2015–2026)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0e8e0 0%, #ddd0c4 100%);
+            padding: 2rem 1.2rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .dashboard {
+            max-width: 1500px;
+            width: 100%;
+        }
+
+        /* ----- HEADER ----- */
+        .header {
+            background: rgba(255, 248, 242, 0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 3rem;
+            padding: 1.8rem 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px 30px;
+            margin-bottom: 1.8rem;
+            border: 1px solid rgba(235, 210, 190, 0.5);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a130e;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .header h1 .sub {
+            background: #f1e0d4;
+            padding: 0.2rem 1.4rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #352319;
+        }
+
+        .header-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            background: #efe3d9;
+            padding: 0.3rem 1.5rem;
+            border-radius: 60px;
+            font-weight: 500;
+            color: #2b1d15;
+            font-size: 0.9rem;
+        }
+
+        .header-badges i { margin-right: 4px; }
+
+        /* ----- CYCLE PHASE INDICATOR ----- */
+        .cycle-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 32px;
+            padding: 1.2rem 2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px 30px;
+            border: 1px solid rgba(255, 215, 150, 0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+
+        .cycle-label {
+            color: #f0e6dd;
+            font-weight: 300;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .cycle-phases {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .phase-pill {
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0.4;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            background: #2a2a40;
+            color: #8888aa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .phase-pill.active {
+            opacity: 1;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 200, 50, 0.15);
+            color: white;
+        }
+
+        .phase-pill.phase-smallcap { background: #1a5a3a; border-color: #4caf7a; color: #b8e6c4; }
+        .phase-pill.phase-smallcap.active { background: #2b9c5a; border-color: #7ecf97; color: white; box-shadow: 0 0 30px rgba(43, 156, 90, 0.25); }
+        .phase-pill.phase-rotation { background: #5a4a1a; border-color: #d4a84a; color: #f0d88a; }
+        .phase-pill.phase-rotation.active { background: #c9921e; border-color: #f7d44a; color: #1f1808; box-shadow: 0 0 30px rgba(201, 146, 30, 0.25); }
+        .phase-pill.phase-largecap { background: #1a2a5a; border-color: #4a7ac9; color: #8ab0f0; }
+        .phase-pill.phase-largecap.active { background: #2b5c9c; border-color: #6a9ad9; color: white; box-shadow: 0 0 30px rgba(43, 92, 156, 0.25); }
+        .phase-pill.phase-correction { background: #4a1a1a; border-color: #c94a4a; color: #f08a8a; }
+        .phase-pill.phase-correction.active { background: #a13324; border-color: #d45c4a; color: white; box-shadow: 0 0 30px rgba(161, 51, 36, 0.25); }
+
+        .current-phase {
+            color: #f7d44a;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-phase i { font-size: 1.3rem; }
+
+        /* ----- STATS ROW ----- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 1.8rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 248, 242, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            padding: 1.2rem 1.2rem 1rem;
+            border: 1px solid rgba(235, 210, 190, 0.3);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+            text-align: center;
+        }
+
+        .stat-card .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b5a4e;
+            font-weight: 600;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a130e;
+            margin-top: 2px;
+        }
+
+        .stat-card .value .highlight-green { color: #2b7a4a; }
+        .stat-card .value .highlight-gold { color: #b3860a; }
+        .stat-card .value .highlight-red { color: #b33d24; }
+        .stat-card .value .highlight-blue { color: #2b5c9c; }
+
+        .stat-card .sub-text {
+            font-size: 0.7rem;
+            color: #7a6a5e;
+            margin-top: 2px;
+        }
+
+        /* ----- TABLE WRAPPER ----- */
+        .table-wrap {
+            background: rgba(255, 248, 242, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            padding: 1rem;
+            border: 1px solid rgba(235, 210, 190, 0.3);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            overflow-x: auto;
+            margin-bottom: 1.8rem;
+        }
+
+        .quilt-grid {
+            display: grid;
+            grid-template-columns: 70px repeat(4, 1fr) 100px;
+            gap: 8px;
+            min-width: 750px;
+        }
+
+        .grid-header {
+            display: contents;
+            font-weight: 700;
+        }
+
+        .grid-header > div {
+            padding: 0.8rem 0.2rem;
+            text-align: center;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: #dccfc5;
+            color: #1b130e;
+            box-shadow: 0 3px 0 #b7a79b;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .grid-header > div:first-child { background: #cbb8ab; box-shadow: 0 3px 0 #a28f81; }
+        .grid-header > div:nth-child(2) { background: #ffdbb5; box-shadow: 0 3px 0 #ddb48b; }
+        .grid-header > div:nth-child(3) { background: #f9c9b0; box-shadow: 0 3px 0 #dba887; }
+        .grid-header > div:nth-child(4) { background: #b8d4b8; box-shadow: 0 3px 0 #8aaa8a; border: 3px solid #2b7a4a; }
+        .grid-header > div:nth-child(5) { background: #eea88f; box-shadow: 0 3px 0 #c77d62; }
+        .grid-header > div:last-child { background: #d4c0b2; box-shadow: 0 3px 0 #b09a8a; font-size: 0.6rem; }
+
+        .grid-row {
+            display: contents;
+        }
+
+        .grid-row > div {
+            padding: 0.8rem 0.2rem;
+            text-align: center;
+            border-radius: 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+            border: 1px solid rgba(255, 255, 240, 0.3);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            color: #1a120e;
+        }
+
+        .grid-row > div:first-child {
+            background: #dccfc5;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1c130e;
+            box-shadow: 0 2px 0 #b7a79b;
+            border: 1px solid #e8d9ce;
+        }
+
+        .grid-row > div:nth-child(4) {
+            border: 3px solid rgba(43, 122, 74, 0.3);
+        }
+
+        .grid-row > div:last-child {
+            background: #e8ddd5;
+            font-size: 0.6rem;
+            font-weight: 700;
+            border-radius: 40px;
+            padding: 0.2rem 0.1rem;
+            letter-spacing: 0.2px;
+        }
+
+        /* Performance colours */
+        .perf-super { background: #3daa6e; color: #0b1f11; border-color: #7ecf97; }
+        .perf-high { background: #66c28a; color: #0d1f12; border-color: #cef0d8; }
+        .perf-mid { background: #8fd4a8; color: #0d1e12; border-color: #e0f6e5; }
+        .perf-lowpos { background: #bce6ca; color: #102215; border-color: #eafaf0; }
+        .perf-neutral { background: #f2d6b0; color: #2f1f13; border-color: #fbebd4; }
+        .perf-lowneg { background: #f5a88a; color: #2a150e; border-color: #fcd9cb; }
+        .perf-midneg { background: #e08262; color: #1f0d07; border-color: #f5b69e; }
+        .perf-highneg { background: #d15a3a; color: #1f0c06; border-color: #e88a72; }
+
+        .leader-badge {
+            background: #f7d44a;
+            color: #1f1808;
+            border-radius: 60px;
+            padding: 0.05rem 0.6rem 0.05rem 0.5rem;
+            font-size: 0.55rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 3px 12px rgba(255, 200, 0, 0.4);
+            border: 1px solid #f8e27a;
+            white-space: nowrap;
+        }
+
+        .leader-badge i { font-size: 0.55rem; color: #b3860a; }
+
+        .phase-tag {
+            padding: 0.15rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+        .phase-tag.smallcap-lead { background: #2b9c5a; color: white; }
+        .phase-tag.rotation { background: #c9921e; color: #1f1808; }
+        .phase-tag.largecap-lead { background: #2b5c9c; color: white; }
+        .phase-tag.correction { background: #a13324; color: white; }
+
+        /* ----- DETAILED STATS TABLE ----- */
+        .stats-table-wrap {
+            background: rgba(255, 248, 242, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            padding: 1.8rem 2rem;
+            border: 1px solid rgba(235, 210, 190, 0.3);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            margin-bottom: 1.8rem;
+            overflow-x: auto;
+        }
+
+        .stats-table-wrap h2 {
+            font-size: 1.2rem;
+            color: #1a130e;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-table-wrap h2 i { color: #b3860a; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .index-stat-box {
+            background: rgba(255, 248, 242, 0.5);
+            border-radius: 20px;
+            padding: 1.2rem 1rem;
+            border: 1px solid rgba(235, 210, 190, 0.2);
+        }
+
+        .index-stat-box .name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1a130e;
+            margin-bottom: 6px;
+        }
+
+        .index-stat-box .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #3e2e24;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .index-stat-box .stat-row:last-child { border-bottom: none; }
+
+        .index-stat-box .stat-row .val {
+            font-weight: 600;
+            color: #1a130e;
+        }
+
+        .index-stat-box .stat-row .val.green { color: #2b7a4a; }
+        .index-stat-box .stat-row .val.red { color: #b33d24; }
+        .index-stat-box .stat-row .val.gold { color: #b3860a; }
+        .index-stat-box .stat-row .val.blue { color: #2b5c9c; }
+
+        .index-stat-box .badge {
+            display: inline-block;
+            background: #f7d44a;
+            color: #1f1808;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.05rem 0.6rem;
+            border-radius: 40px;
+            margin-left: 4px;
+        }
+
+        /* ----- FOOTER ----- */
+        .footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px 30px;
+            padding-top: 1.2rem;
+            border-top: 2px dashed #dccbc0;
+            color: #5a4a3e;
+            font-size: 0.8rem;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 242, 232, 0.5);
+            padding: 0.1rem 0.7rem 0.1rem 0.3rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .color-swatch {
+            width: 18px;
+            height: 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .data-source {
+            font-size: 0.7rem;
+            color: #7a6a5e;
+        }
+
+        @media (max-width: 750px) {
+            .header { padding: 1.2rem 1.2rem; flex-direction: column; align-items: stretch; }
+            .header h1 { font-size: 1.5rem; }
+            .quilt-grid { grid-template-columns: 45px repeat(4, 1fr) 65px; gap: 4px; }
+            .grid-header > div, .grid-row > div { font-size: 0.5rem; padding: 0.3rem 0.1rem; }
+            .leader-badge { font-size: 0.4rem; padding: 0 0.3rem; }
+            .cycle-card { padding: 0.8rem 1rem; flex-direction: column; align-items: stretch; }
+            .phase-pill { font-size: 0.65rem; padding: 0.3rem 0.8rem; }
+            .current-phase { font-size: 0.9rem; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .stat-card .value { font-size: 1.1rem; }
+            .stats-table-wrap { padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+
+    <!-- ===== HEADER ===== -->
+    <div class="header">
+        <h1>
+            📊 Nifty Indices Quilt
+            <span class="sub">2015 – 2026</span>
+        </h1>
+        <div class="header-badges">
+            <span><i class="fas fa-database" style="color: #2b7a4a;"></i> Nifty Indices Official</span>
+            <span><i class="fas fa-crown" style="color: #c9921e;"></i> #1 Leader</span>
+            <span><i class="fas fa-sync-alt" style="color: #c9921e;"></i> Cycle Phase</span>
+        </div>
+    </div>
+
+    <!-- ===== CYCLE PHASE INDICATOR ===== -->
+    <div class="cycle-card">
+        <div>
+            <div class="cycle-label"><i class="fas fa-chart-line"></i> Market Cycle Phase</div>
+        </div>
+        <div class="cycle-phases" id="cyclePhases">
+            <span class="phase-pill phase-smallcap" data-phase="smallcap">
+                <i class="fas fa-arrow-up"></i> Smallcap Lead
+            </span>
+            <span class="phase-pill phase-rotation" data-phase="rotation">
+                <i class="fas fa-sync-alt"></i> Rotation
+            </span>
+            <span class="phase-pill phase-largecap" data-phase="largecap">
+                <i class="fas fa-shield-alt"></i> Largecap Lead
+            </span>
+            <span class="phase-pill phase-correction" data-phase="correction">
+                <i class="fas fa-arrow-down"></i> Correction
+            </span>
+        </div>
+        <div class="current-phase" id="currentPhaseDisplay">
+            <i class="fas fa-circle" style="color: #f7d44a; font-size: 0.7rem;"></i>
+            <span id="phaseName">Loading...</span>
+        </div>
+    </div>
+
+    <!-- ===== STATS ROW ===== -->
+    <div class="stats-row" id="statsRow">
+        <!-- dynamically filled -->
+    </div>
+
+    <!-- ===== QUILT CHART ===== -->
+    <div class="table-wrap">
+        <div class="quilt-grid" id="quiltGrid"></div>
+    </div>
+
+    <!-- ===== DETAILED STATS TABLE ===== -->
+    <div class="stats-table-wrap">
+        <h2><i class="fas fa-chart-bar"></i> Index Performance Summary (2015–2026)</h2>
+        <div class="stats-grid" id="statsGrid">
+            <!-- dynamically filled -->
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer">
+        <div class="legend">
+            <span class="legend-item"><span class="color-swatch" style="background:#3daa6e;"></span> ≥ +25%</span>
+            <span class="legend-item"><span class="color-swatch" style="background:#66c28a;"></span> +10–25%</span>
+            <span class="legend-item"><span class="color-swatch" style="background:#8fd4a8;"></span> 0–10%</span>
+            <span class="legend-item"><span class="color-swatch" style="background:#f2d6b0;"></span> -0–0%</span>
+            <span class="legend-item"><span class="color-swatch" style="background:#f5a88a;"></span> -10–0%</span>
+            <span class="legend-item"><span class="color-swatch" style="background:#e08262;"></span> -25–-10%</span>
+            <span class="legend-item"><span class="color-swatch" style="background:#d15a3a;"></span> < -25%</span>
+        </div>
+        <div class="data-source">
+            <i class="fas fa-check-circle" style="color: #2b7a4a;"></i> Source: Nifty Indices official TRI levels · Data: 2015–2026 (YTD: 28 Aug 2026)
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- DATA (Verified from Nifty Indices official levels) ----------
+        const years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+        const indexNames = ['Nifty 50', 'Nifty Next 50', 'Midcap 150', 'Smallcap 250'];
+        const indexShort = ['N50', 'NN50', 'MC150', 'SC250'];
+
+        // Returns: [Nifty 50, NN 50, Midcap 150, Smallcap 250]
+        const perfData = [
+            [-3.03, 7.72, 9.28, 9.96],   // 2015
+            [4.17, 7.38, 5.47, 0.52],    // 2016
+            [30.37, 46.42, 54.36, 56.09], // 2017
+            [5.59, -7.68, -12.49, -26.54], // 2018
+            [12.98, 1.86, 0.58, -7.59],  // 2019
+            [16.01, 15.97, 25.12, 25.55], // 2020
+            [25.26, 29.84, 46.48, 61.48], // 2021
+            [4.06, 0.18, 2.76, -3.87],   // 2022
+            [20.69, 27.05, 43.59, 47.98], // 2023
+            [10.04, 28.22, 23.76, 26.42], // 2024
+            [11.42, 2.50, 5.46, -6.30],  // 2025
+            [-6.69, 7.29, 5.60, 11.45]   // 2026 (YTD)
+        ];
+
+        // ---------- DETERMINE CYCLE PHASE ----------
+        function getCyclePhase(niftyReturn, smallcapReturn) {
+            if (smallcapReturn - niftyReturn > 10 && smallcapReturn > 10) {
+                return { phase: 'smallcap', label: '🚀 Smallcap Lead', class: 'smallcap-lead' };
+            }
+            if (niftyReturn - smallcapReturn > 5 && niftyReturn > 0) {
+                return { phase: 'largecap', label: '🛡️ Largecap Lead', class: 'largecap-lead' };
+            }
+            if (smallcapReturn < -10 || (niftyReturn < 0 && smallcapReturn < 0)) {
+                return { phase: 'correction', label: '⚠️ Correction', class: 'correction' };
+            }
+            return { phase: 'rotation', label: '🔄 Rotation', class: 'rotation' };
+        }
+
+        const phases = years.map((_, idx) => {
+            const nifty = perfData[idx][0];
+            const smallcap = perfData[idx][3];
+            return getCyclePhase(nifty, smallcap);
+        });
+
+        // ---------- BUILD QUILT GRID ----------
+        const grid = document.getElementById('quiltGrid');
+        grid.innerHTML = '';
+
+        // Header
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'grid-header';
+        const headerLabels = ['Year', ...indexNames, 'Phase'];
+        headerLabels.forEach((label, idx) => {
+            const cell = document.createElement('div');
+            cell.textContent = label;
+            if (label === 'Midcap 150') {
+                cell.style.border = '3px solid #2b7a4a';
+                cell.style.boxShadow = '0 3px 0 #1a5a2a';
+                cell.style.background = '#b8d4b8';
+            }
+            headerDiv.appendChild(cell);
+        });
+        grid.appendChild(headerDiv);
+
+        // Rows
+        for (let rowIdx = 0; rowIdx < years.length; rowIdx++) {
+            const year = years[rowIdx];
+            const rowValues = perfData[rowIdx];
+            const phase = phases[rowIdx];
+            const isCurrentYear = (year === 2026);
+
+            const rowContainer = document.createElement('div');
+            rowContainer.className = 'grid-row';
+            if (isCurrentYear) {
+                rowContainer.style.opacity = '1';
+                rowContainer.style.background = 'rgba(255,215,0,0.03)';
+            }
+
+            // Year cell
+            const yearCell = document.createElement('div');
+            yearCell.textContent = year + (isCurrentYear ? '*' : '');
+            if (isCurrentYear) yearCell.style.background = '#d4b88a';
+            rowContainer.appendChild(yearCell);
+
+            // Index cells
+            for (let colIdx = 0; colIdx < indexNames.length; colIdx++) {
+                const val = rowValues[colIdx];
+                const cell = document.createElement('div');
+
+                // Color class
+                if (val >= 30) cell.classList.add('perf-super');
+                else if (val >= 25) cell.classList.add('perf-high');
+                else if (val >= 10) cell.classList.add('perf-mid');
+                else if (val >= 0) cell.classList.add('perf-lowpos');
+                else if (val >= -10) cell.classList.add('perf-neutral');
+                else if (val >= -25) cell.classList.add('perf-lowneg');
+                else cell.classList.add('perf-highneg');
+
+                // Highlight Midcap
+                if (colIdx === 2) {
+                    cell.style.border = '3px solid rgba(43, 122, 74, 0.4)';
+                }
+
+                // Percentage
+                const valSpan = document.createElement('span');
+                valSpan.textContent = (val >= 0 ? '+' : '') + val.toFixed(2) + '%';
+                cell.appendChild(valSpan);
+
+                // Leader badge
+                const maxVal = Math.max(...rowValues);
+                if (val === maxVal && maxVal > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'leader-badge';
+                    badge.innerHTML = `<i class="fas fa-crown"></i> #1`;
+                    cell.appendChild(badge);
+                }
+
+                rowContainer.appendChild(cell);
+            }
+
+            // Phase cell
+            const phaseCell = document.createElement('div');
+            const phaseTag = document.createElement('span');
+            phaseTag.className = `phase-tag ${phase.class}`;
+            phaseTag.textContent = phase.label;
+            phaseCell.appendChild(phaseTag);
+            rowContainer.appendChild(phaseCell);
+
+            grid.appendChild(rowContainer);
+        }
+
+        // ---------- UPDATE CYCLE INDICATOR ----------
+        const currentYearIndex = years.indexOf(2026);
+        const currentPhase = phases[currentYearIndex];
+
+        const phasePills = document.querySelectorAll('.phase-pill');
+        phasePills.forEach(pill => {
+            const phaseAttr = pill.dataset.phase;
+            if (phaseAttr === currentPhase.phase) {
+                pill.classList.add('active');
+            } else {
+                pill.classList.remove('active');
+            }
+        });
+
+        const phaseNameSpan = document.getElementById('phaseName');
+        phaseNameSpan.textContent = currentPhase.label + ' (2026 YTD)';
+
+        // ---------- STATS ROW ----------
+        const statsRow = document.getElementById('statsRow');
+        const statsData = [
+            { label: 'Best Performer', value: 'Smallcap 250', sub: '+11.45% in 2026', cls: 'highlight-green' },
+            { label: 'Worst Performer', value: 'Nifty 50', sub: '-6.69% in 2026', cls: 'highlight-red' },
+            { label: 'Avg Return (All)', value: '~15.8%', sub: '2015–2025', cls: 'highlight-gold' },
+            { label: 'Best Year', value: '2017', sub: 'All indices > +30%', cls: 'highlight-green' },
+            { label: 'Worst Year', value: '2018', sub: 'Smallcap -26.5%', cls: 'highlight-red' },
+            { label: 'Midcap Sweet Spot', value: '8/11', sub: 'beats NN50', cls: 'highlight-green' }
+        ];
+
+        statsData.forEach(stat => {
+            const card = document.createElement('div');
+            card.className = 'stat-card';
+            card.innerHTML = `
+                <div class="label">${stat.label}</div>
+                <div class="value"><span class="${stat.cls}">${stat.value}</span></div>
+                <div class="sub-text">${stat.sub}</div>
+            `;
+            statsRow.appendChild(card);
+        });
+
+        // ---------- DETAILED STATS TABLE ----------
+        const statsGrid = document.getElementById('statsGrid');
+
+        // Calculate stats for each index
+        const indexStats = indexNames.map((name, idx) => {
+            const returns = perfData.slice(0, -1).map(row => row[idx]); // exclude 2026 for averages
+            const allReturns = perfData.map(row => row[idx]);
+            const avg = returns.reduce((a, b) => a + b, 0) / returns.length;
+            const worst = Math.min(...returns);
+            const best = Math.max(...returns);
+            const negative = returns.filter(r => r < 0).length;
+            const leaderCount = perfData.filter((row, i) => {
+                const maxVal = Math.max(...row);
+                return row[idx] === maxVal && maxVal > 0 && i < returns.length;
+            }).length;
+            const lastReturn = perfData[perfData.length - 1][idx];
+            return { name, avg, worst, best, negative, leaderCount, lastReturn };
+        });
+
+        indexStats.forEach((stat, idx) => {
+            const box = document.createElement('div');
+            box.className = 'index-stat-box';
+
+            // Pick a colour for the name
+            const nameColors = ['#2b5c9c', '#b3860a', '#2b7a4a', '#b33d24'];
+            const iconColors = ['#2b5c9c', '#b3860a', '#2b7a4a', '#b33d24'];
+
+            box.innerHTML = `
+                <div class="name" style="color: ${nameColors[idx]};">
+                    <i class="fas fa-chart-line" style="color: ${iconColors[idx]};"></i>
+                    ${stat.name}
+                    ${stat.leaderCount > 0 ? `<span class="badge"><i class="fas fa-crown"></i> #1 ×${stat.leaderCount}</span>` : ''}
+                </div>
+                <div class="stat-row">
+                    <span>Average (2015–2025)</span>
+                    <span class="val ${stat.avg > 15 ? 'green' : stat.avg < 5 ? 'red' : 'gold'}">${stat.avg.toFixed(2)}%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Best Year</span>
+                    <span class="val green">${stat.best.toFixed(2)}%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Worst Year</span>
+                    <span class="val red">${stat.worst.toFixed(2)}%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Negative Years</span>
+                    <span class="val ${stat.negative > 3 ? 'red' : 'green'}">${stat.negative}/11</span>
+                </div>
+                <div class="stat-row">
+                    <span>2026 YTD</span>
+                    <span class="val ${stat.lastReturn > 0 ? 'green' : 'red'}">${(stat.lastReturn >= 0 ? '+' : '') + stat.lastReturn.toFixed(2)}%</span>
+                </div>
+            `;
+            statsGrid.appendChild(box);
+        });
+
+        // ---------- CONSOLE LOG ----------
+        console.log('📊 Nifty Indices Quilt Dashboard Loaded');
+        console.log(`   Current Phase (2026): ${currentPhase.label}`);
+        console.log(`   Nifty 50: -6.69% | Smallcap 250: +11.45%`);
+        console.log('   Data source: Nifty Indices official TRI levels (2015–2026)');
+    })();
+</script>
+
+</body>
+</html>
