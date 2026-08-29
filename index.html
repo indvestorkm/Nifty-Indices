@@ -80,6 +80,54 @@
     border-radius: 10px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
+
+/* Radio button navigation styles */
+.nav-radio-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    background: #f1f5f9;
+    padding: 1.2rem 2rem;
+    border-radius: 60px;
+    margin: 2.5rem auto 1.5rem auto;
+    max-width: 650px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.nav-radio-container label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a130e;
+    cursor: pointer;
+    padding: 0.3rem 0.8rem;
+    border-radius: 40px;
+    transition: all 0.2s;
+}
+
+.nav-radio-container label:hover {
+    background: rgba(43, 122, 74, 0.08);
+}
+
+.nav-radio-container input[type="radio"] {
+    accent-color: #2b7a4a;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.nav-radio-container .highlight {
+    background: #e8f0e8;
+    border: 2px solid #2b7a4a;
+}
+
+.nav-radio-container .highlight:hover {
+    background: #d4e8d4;
+}
 </style>
 
 </head>
@@ -219,37 +267,20 @@ Historical Index Data
 
 </div>
 
-<!-- ===== UPDATED: NIFTY INDICES HISTORICAL DATA WITH QUILT CHART LINK ===== -->
 <h2>Nifty Indices Historical Data</h2>
 
 <div class="grid">
 
-<!-- 🧵 YOUR QUILT CHART LINK - FEATURED CARD -->
-<div class="card" style="background: #e8f0e8; border: 2px solid #2b7a4a; box-shadow: 0 4px 16px rgba(43, 122, 74, 0.15);">
-    <div class="category">📊 Interactive Dashboard</div>
-    <a href="Nifty Indices Quilt.html" target="_blank" style="font-size: 18px; color: #1a5a2a; font-weight: bold; display: block; margin: 6px 0;">
-        🧵 Nifty Indices Quilt Chart
-    </a>
-    <div style="font-size: 12px; color: #2b7a4a; margin-top: 4px;">
-        ⭐ 2015–2026 · CAGR · Rolling Returns · Market Cycle Phases
-    </div>
-    <div style="font-size: 11px; color: #5a7a5a; margin-top: 6px; border-top: 1px dashed #b8d4b8; padding-top: 6px;">
-        <i class="fas fa-external-link-alt"></i> Opens in new tab
-    </div>
+<div class="card">
+<a href="https://www.niftyindices.com/reports/historical-data" target="_blank">
+Nifty Historical TRI/PRI/PE/PD/DY Data
+</a>
 </div>
 
 <div class="card">
-    <div class="category">Official Data</div>
-    <a href="https://www.niftyindices.com/reports/historical-data" target="_blank">
-        Nifty Historical TRI/PRI/PE/PD/DY Data
-    </a>
-</div>
-
-<div class="card">
-    <div class="category">Official Data</div>
-    <a href="https://www.niftyindices.com/market-data/return-profile" target="_blank">
-        Nifty Return Profile
-    </a>
+<a href="https://www.niftyindices.com/market-data/return-profile" target="_blank">
+Nifty Return Profile
+</a>
 </div>
 
 </div>
@@ -314,6 +345,56 @@ Vanguard Total World Stock ETF Ticker: VT (US9220427424) (CUSIP: 922042742)
 </div>
 
 </div>
+
+<!-- ===== NAVIGATION RADIO BUTTONS ===== -->
+<div class="nav-radio-container">
+    <label>
+        <input type="radio" name="nav" value="quilt">
+        🧵 Quilt Chart
+    </label>
+
+    <label>
+        <input type="radio" name="nav" value="smallcap">
+        📈 Smallcap 250
+    </label>
+
+    <label class="highlight">
+        <input type="radio" name="nav" value="nifty500" checked>
+        📊 Nifty 500
+    </label>
+</div>
+
+<!-- Navigation Script -->
+<script>
+    (function() {
+        const radios = document.querySelectorAll('input[name="nav"]');
+        
+        radios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    const value = this.value;
+                    let url = '';
+                    
+                    switch(value) {
+                        case 'quilt':
+                            url = 'Nifty Indices Quilt.html';
+                            break;
+                        case 'smallcap':
+                            url = 'Nifty_Smallcap_250.html';
+                            break;
+                        case 'nifty500':
+                            url = 'Nifty_500.html';
+                            break;
+                        default:
+                            return;
+                    }
+                    
+                    window.open(url, '_blank');
+                }
+            });
+        });
+    })();
+</script>
 
 <footer>
 "Unless and until what you are building is based on Truth & Honesty, you are building on sand; it can't stand; it simply cannot withstand the test of time."
