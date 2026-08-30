@@ -196,52 +196,72 @@
         padding: 10px;
     }
 
-    /* Radio button navigation styles */
-    .nav-radio-container {
+    /* Navigation buttons - solid buttons, no radio dots */
+    .nav-button-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 2rem;
+        gap: 1.2rem;
         background: #f1f5f9;
-        padding: 1.2rem 2rem;
+        padding: 1rem 2rem;
         border-radius: 60px;
         margin: 2.5rem auto 1.5rem auto;
-        max-width: 650px;
+        max-width: 850px;
         flex-wrap: wrap;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
-    .nav-radio-container label {
-        display: flex;
+    .nav-btn {
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: #1a130e;
-        cursor: pointer;
-        padding: 0.3rem 0.8rem;
+        gap: 6px;
+        padding: 0.5rem 1.2rem;
         border-radius: 40px;
-        transition: all 0.2s;
-    }
-
-    .nav-radio-container label:hover {
-        background: rgba(43, 122, 74, 0.08);
-    }
-
-    .nav-radio-container input[type="radio"] {
-        accent-color: #2b7a4a;
-        width: 18px;
-        height: 18px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1a130e;
+        background: white;
+        border: 2px solid #dce3eb;
+        text-decoration: none;
         cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
 
-    .nav-radio-container .highlight {
+    .nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-color: #b0bcc9;
+    }
+
+    .nav-btn.green {
+        border-color: #2b7a4a;
         background: #e8f0e8;
-        border: 2px solid #2b7a4a;
     }
 
-    .nav-radio-container .highlight:hover {
+    .nav-btn.green:hover {
         background: #d4e8d4;
+        border-color: #1a5a2a;
+    }
+
+    .nav-btn.purple {
+        border-color: #6a1a8a;
+        background: #f3ecf5;
+    }
+
+    .nav-btn.purple:hover {
+        background: #e6d4ea;
+        border-color: #4a1a5a;
+    }
+
+    .nav-btn.blue {
+        border-color: #2b5c9c;
+        background: #e8edf5;
+    }
+
+    .nav-btn.blue:hover {
+        background: #d4dce8;
+        border-color: #1a3a6a;
     }
 
     /* US Market Hours */
@@ -293,8 +313,8 @@
     @media (max-width: 600px) {
         .forex-card .rate { font-size: 1.5rem; }
         .vt-card .rate { font-size: 1.3rem; }
-        .nav-radio-container { gap: 0.8rem; padding: 0.8rem 1rem; }
-        .nav-radio-container label { font-size: 0.8rem; padding: 0.2rem 0.5rem; }
+        .nav-button-container { gap: 0.6rem; padding: 0.8rem 1rem; }
+        .nav-btn { font-size: 0.75rem; padding: 0.3rem 0.8rem; }
         #datetime { font-size: 15px; min-width: auto; padding: 10px; }
         #market-status { font-size: 14px; min-width: auto; padding: 6px 14px; }
         .us-market-container { padding: 1rem; }
@@ -541,22 +561,23 @@ Tata Gold ETF (INF277KA1976)
 
 </div>
 
-<!-- ===== NAVIGATION RADIO BUTTONS ===== -->
-<div class="nav-radio-container">
-    <label>
-        <input type="radio" name="nav" value="quilt">
+<!-- ===== NAVIGATION BUTTONS (Solid, no radio dots) ===== -->
+<div class="nav-button-container">
+    <a href="Nifty Indices Quilt.html" target="_blank" class="nav-btn blue">
         🧵 Quilt Chart
-    </label>
+    </a>
 
-    <label>
-        <input type="radio" name="nav" value="smallcap">
+    <a href="Nifty_Smallcap_250.html" target="_blank" class="nav-btn">
         📈 Smallcap 250
-    </label>
+    </a>
 
-    <label class="highlight">
-        <input type="radio" name="nav" value="nifty500" checked>
+    <a href="Nifty_500.html" target="_blank" class="nav-btn green">
         📊 Nifty 500
-    </label>
+    </a>
+
+    <a href="Compare_Indices.html" target="_blank" class="nav-btn purple">
+        🌟 Nifty Total Market
+    </a>
 </div>
 
 <!-- ===== US MARKET HOURS ===== -->
@@ -569,38 +590,6 @@ Tata Gold ETF (INF277KA1976)
     </div>
     <div class="season" id="usSeason">Currently: Checking season...</div>
 </div>
-
-<!-- Navigation Script -->
-<script>
-    (function() {
-        const radios = document.querySelectorAll('input[name="nav"]');
-        
-        radios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.checked) {
-                    const value = this.value;
-                    let url = '';
-                    
-                    switch(value) {
-                        case 'quilt':
-                            url = 'Nifty Indices Quilt.html';
-                            break;
-                        case 'smallcap':
-                            url = 'Nifty_Smallcap_250.html';
-                            break;
-                        case 'nifty500':
-                            url = 'Nifty_500.html';
-                            break;
-                        default:
-                            return;
-                    }
-                    
-                    window.open(url, '_blank');
-                }
-            });
-        });
-    })();
-</script>
 
 <footer>
 "Unless and until what you are building is based on Truth & Honesty, you are building on sand; it can't stand; it simply cannot withstand the test of time."
